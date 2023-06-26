@@ -1,0 +1,10 @@
+1.ps -A --sort=cmd
+2.ls -A|grep -r"\.conf"
+3.touch echo.sh
+vim echo.sh
+  {
+    #!/etc/sh
+    echo hello world;
+  }                            //content in echo.sh
+  chomd +c echo.sh
+  ./echo.sh

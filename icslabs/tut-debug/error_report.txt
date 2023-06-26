@@ -1,0 +1,102 @@
+/*
+ * BUG#0
+ * description: 
+     miss semicolon
+ * location: 
+ *   int a = 10  (line 18)
+ * evidence: 
+ *   test.c:19: error: two or more data types in declaration specifiers
+ */
+
+BUG#1
+description:no semicolon
+
+location:} record_t
+
+evidence:error:expected '=', ',', ';', 'asm' or '__attribute__' before 'static'
+
+
+
+BUG#2
+description:no semicolon
+
+location:enum{ buf_size = buf_nrec * 100}
+
+evidence:error: expected ';', identifier or '(' before 'struct'
+
+
+
+BUG#3
+description:wrong type
+
+location:gen_rec(record *rec)
+
+evidence:error: unknown type name 'record'
+
+
+
+BUG#4
+description:no including
+
+location:FILE *file = fopen(fn, "r")
+
+evidence:error: unknown type name 'FILE'
+
+
+
+BUG#5
+description:no brace
+
+location:if(!file)
+
+evidence:error: expected identifier or '(' before 'while'
+
+
+
+BUG#6
+description:wrong file open mode 
+
+location:FILE *file = fopen(fn, "r");
+
+evidence:unable to open file sort100mb.dat
+
+
+
+
+BUG#7
+description:wrong parameter in cycle
+
+location:for (j=0; j<10; i++)
+
+evidence:the cycle will continue
+
+
+
+
+BUG#8
+description:memory not enough
+
+location:char *buf = (char *)malloc(buf_nrec)
+
+evidence: size of record_t is larger than that of buf
+
+
+
+
+BUG#9
+description:(rec_len)length is wrong 
+
+location:enum{ rec_len = key_len + pad_len}
+
+evidence:rec_len is 100
+
+
+
+
+BUG#10
+description:operator wrong
+
+location:for (cnt = 0; (cnt <= buf_nrec)
+
+evidence:(cnt) start with 0 but end with buf_nrec 
+

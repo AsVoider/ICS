@@ -1,0 +1,213 @@
+#/* $begin ncopy-ys */
+##################################################################
+# ncopy.ys - Copy a src block of len words to dst.
+# Return the number of positive words (>0) contained in src.
+#
+# Include your name and ID here.
+# GJX 521021910197
+#
+# Describe how and why you modified the baseline code.
+# NO.1 use iaddq 
+# NO.2 unrolling(8 or 10) finally choose 10
+# NO.3 rmmovq + mrmovq lose long time  try to add something meaningful (edit the pipe-full.hcl)
+# NO.4 its remaining length ---- 1-3 / 4-6 / 7-9 /
+# (try to adjust the place "andq" and way to check 1-9)
+# NO.5 cancel "xorq %rax,%rax"
+# I've tried to use jump table, but effect is not as my wish
+##################################################################
+# Do not modify this portion
+# Function prologue.
+# %rdi = src, %rsi = dst, %rdx = len
+ncopy:
+
+##################################################################
+# You can modify this portion
+	# Loop header
+	#xorq %rax,%rax		# count = 0;
+
+Test:	iaddq $-10,%rdx		
+	jl remain
+
+solveten:
+	mrmovq (%rdi),%rcx
+	mrmovq 0x8(%rdi),%r8
+	mrmovq 0x10(%rdi),%r9
+	mrmovq 0x18(%rdi),%r10
+	mrmovq 0x20(%rdi),%r11
+	mrmovq 0x28(%rdi),%r12
+	mrmovq 0x30(%rdi),%r13
+	mrmovq 0x38(%rdi),%r14
+	mrmovq 0x40(%rdi),%rbp
+	mrmovq 0x48(%rdi),%rbx
+	
+	rmmovq %rcx, (%rsi)	   
+	rmmovq %r8, 0x8(%rsi)     
+	rmmovq %r9, 0x10(%rsi)    
+	rmmovq %r10, 0x18(%rsi)   
+	rmmovq %r11, 0x20(%rsi)   
+	rmmovq %r12, 0x28(%rsi)   
+	rmmovq %r13, 0x30(%rsi)   
+	rmmovq %r14, 0x38(%rsi)   
+	rmmovq %rbp, 0x40(%rsi)   
+	rmmovq %rbx, 0x48(%rsi)
+	andq %rcx,%rcx
+	jle tenof1
+	iaddq $1,%rax
+
+tenof1:
+	andq %r8,%r8
+	jle tenof2
+	iaddq $1,%rax
+	
+tenof2: 
+	andq %r9,%r9
+	jle tenof3
+	iaddq $1,%rax
+
+tenof3:
+	andq %r10,%r10
+	jle tenof4
+	iaddq $1,%rax
+	
+tenof4:
+	andq %r11,%r11
+	jle tenof5
+	iaddq $1,%rax
+	
+tenof5:
+	andq %r12,%r12
+	jle tenof6
+	iaddq $1,%rax
+	
+tenof6:
+	andq %r13,%r13
+	jle tenof7
+	iaddq $1,%rax
+	
+tenof7:
+	andq %r14,%r14
+	jle tenof8
+	iaddq $1,%rax
+
+tenof8:
+	andq %rbp,%rbp
+	jle tenof9
+	iaddq $1,%rax
+	
+tenof9:
+	andq %rbx,%rbx
+	jle tenof10
+	iaddq $1,%rax
+	
+tenof10:
+	iaddq $80,%rdi
+	iaddq $80,%rsi
+	iaddq $-10,%rdx
+	jge solveten 
+
+remain:
+	mrmovq (%rdi),%r9
+	iaddq $7,%rdx
+	jl L3
+	jg GE3
+	je E3
+	
+	
+L3:	iaddq $2,%rdx
+	je E1
+	iaddq $-1,%rdx
+	je E2
+	ret	
+
+GE3:	iaddq $-3,%rdx
+	jg M79
+	je E6
+	iaddq $1,%rdx
+	jl E4
+	je E5
+	
+
+M79:	iaddq $-2,%rdx
+	jl E7
+	je E8
+
+E9:	
+	mrmovq 0x40(%rdi),%r8
+	rmmovq %r8,0x40(%rsi)
+	andq %r8,%r8
+	
+E8:
+	mrmovq 0x38(%rdi),%r8
+	rmmovq %r8,0x38(%rsi)
+	jle ERR8
+	iaddq $1,%rax
+ERR8:
+	andq %r8,%r8
+	
+E7:
+	mrmovq 0x30(%rdi),%r8
+	rmmovq %r8,0x30(%rsi)
+	jle ERR7
+	iaddq $1,%rax
+ERR7:
+	
+	andq %r8,%r8
+	
+E6:
+	mrmovq 0x28(%rdi),%r8
+	rmmovq %r8,0x28(%rsi)
+	jle ERR6
+	iaddq $1,%rax
+ERR6:
+	andq %r8,%r8
+	
+E5:
+	mrmovq 0x20(%rdi),%r8
+	rmmovq %r8,0x20(%rsi)	
+	jle ERR5
+	iaddq $1,%rax
+ERR5:
+	andq %r8,%r8
+
+E4:
+	mrmovq 0x18(%rdi),%r8
+	rmmovq %r8,0x18(%rsi)
+	jle ERR4
+	iaddq $1,%rax
+ERR4:
+	andq %r8,%r8
+
+E3:
+	mrmovq 0x10(%rdi),%r8
+	rmmovq %r8,0x10(%rsi)
+	jle ERR3
+	iaddq $1,%rax
+ERR3:
+	andq %r8,%r8
+	
+E2:
+	mrmovq 0x8(%rdi),%r8
+	rmmovq %r8,0x8(%rsi)
+	jle ERR2
+	iaddq $1,%rax
+ERR2:
+	andq %r8,%r8
+
+E1:	
+	jle ERR1
+	iaddq $1,%rax
+ERR1:
+	andq %r9,%r9
+	rmmovq %r9,(%rsi)	
+	jle Done
+	iaddq $1,%rax
+
+##################################################################
+# Do not modify the following section of code
+# Function epilogue.
+Done:
+	ret
+##################################################################
+# Keep the following label at the end of your function
+End:
+#/* $end ncopy-ys */

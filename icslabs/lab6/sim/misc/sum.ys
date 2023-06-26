@@ -1,0 +1,41 @@
+# GJX 521021910197
+
+        .pos 0
+        irmovq stack,%rsp
+        call main
+        halt
+    
+#link list
+        .align 8
+ele1:    
+	.quad 0x00a
+	.quad ele2
+ele2:
+	.quad 0x0b0
+	.quad ele3
+ele3:
+	.quad 0xc00
+	.quad 0
+
+sum:
+	irmovq $0,%rax
+	jmp Loop
+
+loop:
+	mrmovq (%rdi),%r8
+	addq %r8,%rax
+	mrmovq 0x8(%rdi),%r8
+	rrmovq %r8, %rdi
+	
+Loop:
+	andq %rdi,%rdi
+	jne loop
+	ret
+
+main:
+	irmovq ele1,%rdi
+	call sum
+	ret
+
+	.pos 0x200
+stack:
